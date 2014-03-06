@@ -1,0 +1,5 @@
+{application, pretty_errors, [
+  {description, "Error and stack trace pretty printers"},
+  {vsn, "0.1"},
+  {applications, [kernel, stdlib]}
+]}.
