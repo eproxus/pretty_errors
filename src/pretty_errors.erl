@@ -15,7 +15,11 @@ stacktrace(Stacktrace, Options) ->
 stacktrace_pretty(_Indent, []) ->
     [];
 stacktrace_pretty(Indent, [Entry|Stacktrace]) ->
-    {Mod, Func, Arity, Location} = Entry,
+    {Mod, Func, ArityOrArgs, Location} = Entry,
+    Arity = case ArityOrArgs of
+        N when is_integer(N) -> N;
+        Args -> length(Args)
+    end,
     LocationOutput = case Location of
         [{file, File}, {line, Line}] -> 
             [<<" (">>, File, <<":">>, integer_to_binary(Line), <<")">>];
