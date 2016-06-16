@@ -15,19 +15,18 @@ stacktrace(Stacktrace, Options) ->
 stacktrace_pretty(_Indent, []) ->
     [];
 stacktrace_pretty(Indent, [Entry|Stacktrace]) ->
-    {Mod, Func, Arity, [{file, File}, {line, Line}]} = Entry,
-    Output = [
-        Indent,
-        atom_to_list(Mod),
-        <<":">>,
-        atom_to_list(Func),
-        <<"/">>,
-        integer_to_binary(Arity),
-        <<" (">>,
-        File,
-        <<":">>,
-        integer_to_binary(Line),
-        <<")">>,
-        io_lib:format("~n", [])
-    ],
+    {Mod, Func, ArityOrArgs, Location} = Entry,
+    Arity = case ArityOrArgs of
+        N when is_integer(N) -> N;
+        Args -> length(Args)
+    end,
+    LocationOutput = case Location of
+        [{file, File}, {line, Line}] -> 
+            [<<" (">>, File, <<":">>, integer_to_binary(Line), <<")">>];
+        _ -> []
+    end,
+    Output =
+        [Indent, atom_to_list(Mod), <<":">>, atom_to_list(Func), <<"/">>, integer_to_binary(Arity)]
+        ++ LocationOutput ++
+        [io_lib:format("~n", [])],
     [Output|stacktrace_pretty(Indent, Stacktrace)].
